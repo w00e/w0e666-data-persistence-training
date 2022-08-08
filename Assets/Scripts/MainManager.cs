@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -11,6 +9,7 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text NameScoreText;
     public GameObject GameOverText;
     
     private bool m_Started = false;
@@ -20,6 +19,10 @@ public class MainManager : MonoBehaviour
 
     
     // Start is called before the first frame update
+    private void Awake() 
+    {
+        NameScoreText.text = $"Player : {DataPersistance.dataPersistance.PlayerName} : Score : {m_Points}";
+    }
     void Start()
     {
         const float step = 0.6f;
