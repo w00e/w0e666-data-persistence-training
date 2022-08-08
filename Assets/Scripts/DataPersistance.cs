@@ -3,7 +3,7 @@ using UnityEngine;
 public class DataPersistance : MonoBehaviour
 {
     public static DataPersistance dataPersistance {get; private set;}
-    private string _playerName = "name";
+    private string _playerName = "nameTest";
     public string PlayerName
     {
         get => _playerName;
