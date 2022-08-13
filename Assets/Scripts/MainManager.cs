@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-
+using System.IO;
 public class MainManager : MonoBehaviour
 {
     public Brick BrickPrefab;
@@ -10,18 +10,37 @@ public class MainManager : MonoBehaviour
 
     public Text ScoreText;
     public Text NameScoreText;
+    public PlayerData playerData;
     public GameObject GameOverText;
     
     private bool m_Started = false;
     private int m_Points;
+    private static int m_HighScore;
     
     private bool m_GameOver = false;
+
+    private static string SAVE_DIRECTORY;
+    private const string SAVE_FILE_NAME = "/savefile.json";
 
     
     // Start is called before the first frame update
     private void Awake() 
     {
-        NameScoreText.text = $"Player : {DataPersistance.dataPersistance.PlayerName} : Score : {m_Points}";
+        SAVE_DIRECTORY = Application.persistentDataPath;
+        try{
+            LoadData();
+            Debug.Log(playerData.PlayerName);
+        } catch (IOException e){
+            Debug.LogError(e);
+        }
+        
+        if(playerData.PlayerName == "") {
+            playerData = new PlayerData(DataPersistance.dataPersistance.PlayerName, 0);
+        } else 
+        {
+            NameScoreText.text = $"Best Player : {playerData.PlayerName} : Top Score : {playerData.TopScore}";
+        }
+       
     }
     void Start()
     {
@@ -73,7 +92,48 @@ public class MainManager : MonoBehaviour
 
     public void GameOver()
     {
+        if(m_Points > playerData.TopScore)
+        {
+            m_HighScore = m_Points;
+            playerData = new PlayerData(DataPersistance.dataPersistance.PlayerName, m_HighScore);
+            SaveData();
+        }
         m_GameOver = true;
         GameOverText.SetActive(true);
+        NameScoreText.text = $"Best Player : {playerData.PlayerName} : Top Score : {playerData.TopScore}";
+        
     }
+
+    public void SaveData()
+    {
+        DataSave data = new DataSave();
+        data.playerData = playerData;
+        string json = JsonUtility.ToJson(data);
+        File.WriteAllText(SAVE_DIRECTORY + SAVE_FILE_NAME, json);
+    }
+
+    public void LoadData()
+    {
+        string path = SAVE_DIRECTORY + SAVE_FILE_NAME;
+        Debug.Log(path);
+        if(File.Exists(path))
+        {
+            string json = File.ReadAllText(path);
+            DataSave data = JsonUtility.FromJson<DataSave>(json);
+            playerData = data.playerData;
+        }
+
+
+    }
+
+    public void ReturnToMenu() {
+        SceneManager.LoadScene(0, LoadSceneMode.Single);
+    }
+    [System.Serializable]
+    private class DataSave 
+    {
+        public PlayerData playerData;
+
+    }
+
 }

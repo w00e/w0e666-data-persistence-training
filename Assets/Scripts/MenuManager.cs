@@ -1,18 +1,14 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using System.IO;
 
 public class MenuManager : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public InputField PlayerNameField;
+    public void StartGame()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        DataPersistance.dataPersistance.PlayerName = PlayerNameField.text;
+        SceneManager.LoadScene(1, LoadSceneMode.Single);   
     }
 }
